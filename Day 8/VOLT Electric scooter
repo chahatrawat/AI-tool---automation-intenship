@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOLT. — Rent an Electric Scooter Near You</title>
+<meta name="description" content="Unlock a VOLT. scooter in seconds. No subscriptions, no hassle — just scan, ride, and go. Electric scooters available across the city, starting at ₹10/min.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --volt-accent: #C8F000;
+    --volt-dark: #0D1117;
+    --volt-slate: #1E2530;
+    --volt-mist: #E8EDF2;
+    --volt-mist-dim: rgba(232,237,242,0.55);
+    --volt-mist-faint: rgba(232,237,242,0.15);
+    --volt-accent-dim: rgba(200,240,0,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--volt-dark);
+    color: var(--volt-mist);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--volt-accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s;
+  }
+  .cursor.big { width: 36px; height: 36px; background: var(--volt-accent-dim); border: 1px solid var(--volt-accent); }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px 48px;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--volt-mist-faint);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -1px;
+    color: var(--volt-accent);
+    text-decoration: none;
+  }
+
+  .nav-links { display: flex; align-items: center; gap: 36px; }
+
+  .nav-links a {
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: var(--volt-mist-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--volt-mist); }
+
+  .nav-cta {
+    background: var(--volt-accent) !important;
+    color: var(--volt-dark) !important;
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: opacity 0.2s !important;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 120px 48px 80px;
+    gap: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -100px; top: 50%;
+    transform: translateY(-50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,240,0,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--volt-accent);
+    margin-bottom: 24px;
+    opacity: 0; animation: fadeUp 0.6s 0.1s forwards;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--volt-accent);
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(48px, 6vw, 80px);
+    line-height: 1.05;
+    letter-spacing: -3px;
+    color: var(--volt-mist);
+    margin-bottom: 28px;
+    opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--volt-accent);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 17px; font-weight: 300; line-height: 1.7;
+    color: var(--volt-mist-dim);
+    max-width: 420px;
+    margin-bottom: 40px;
+    opacity: 0; animation: fadeUp 0.7s 0.3s forwards;
+  }
+
+  .hero-actions {
+    display: flex; align-items: center; gap: 20px;
+    opacity: 0; animation: fadeUp 0.7s 0.4s forwards;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--volt-accent);
+    color: var(--volt-dark);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 500;
+    padding: 14px 32px;
+    border-radius: 100px;
+    text-decoration: none;
+    border: none; cursor: none;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary svg { transition: transform 0.2s; }
+  .btn-primary:hover svg { transform: translateX(3px); }
+
+  .btn-ghost {
+    font-size: 14px; font-weight: 300;
+    color: var(--volt-mist-dim);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--volt-mist); }
+
+  /* Scooter SVG */
+  .hero-visual {
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; animation: fadeIn 1s 0.5s forwards;
+    position: relative;
+  }
+
+  .scooter-wrap {
+    position: relative;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-16px); }
+  }
+
+  .hero-stats {
+    display: flex; gap: 32px;
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 0.5px solid var(--volt-mist-faint);
+    opacity: 0; animation: fadeUp 0.7s 0.55s forwards;
+  }
+
+  .stat-item .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px; font-weight: 700;
+    color: var(--volt-accent);
+    letter-spacing: -1px;
+  }
+  .stat-item .stat-label {
+    font-size: 13px; font-weight: 300;
+    color: var(--volt-mist-dim);
+    margin-top: 2px;
+  }
+
+  /* HOW IT WORKS */
+  .section {
+    padding: 100px 48px;
+  }
+
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--volt-accent); margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 56px;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .step {
+    background: var(--volt-slate);
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .step:first-child { border-radius: 16px 0 0 16px; }
+  .step:last-child { border-radius: 0 16px 16px 0; }
+  .step:hover { background: #252d3a; }
+
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 72px; font-weight: 800;
+    color: var(--volt-accent-dim);
+    line-height: 1;
+    margin-bottom: 20px;
+    letter-spacing: -3px;
+  }
+
+  .step-icon {
+    width: 48px; height: 48px;
+    background: var(--volt-accent-dim);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .step h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--volt-mist);
+  }
+
+  .step p {
+    font-size: 14px; font-weight: 300; line-height: 1.7;
+    color: var(--volt-mist-dim);
+  }
+
+  /* AI COPY SECTION */
+  .ai-section {
+    padding: 100px 48px;
+    background: var(--volt-slate);
+  }
+
+  .ai-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  .ai-copy-block { position: relative; }
+
+  .ai-loading {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--volt-mist-dim); font-size: 14px;
+    padding: 20px 0;
+  }
+
+  .ai-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--volt-accent);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .ai-dot:nth-child(2) { animation-delay: 0.2s; }
+  .ai-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+
+  .feature-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 24px;
+    border: 0.5px solid var(--volt-mist-faint);
+    border-radius: 12px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .feature-item:hover {
+    border-color: rgba(200,240,0,0.3);
+    background: var(--volt-accent-dim);
+  }
+
+  .feature-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    background: var(--volt-accent-dim);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .feature-item h4 {
+    font-weight: 500; font-size: 15px;
+    color: var(--volt-mist); margin-bottom: 4px;
+  }
+  .feature-item p {
+    font-size: 13px; font-weight: 300; line-height: 1.6;
+    color: var(--volt-mist-dim);
+  }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-top: 48px;
+  }
+
+  .plan {
+    background: var(--volt-slate);
+    border: 0.5px solid var(--volt-mist-faint);
+    border-radius: 16px;
+    padding: 32px 28px;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+  .plan:hover { border-color: rgba(200,240,0,0.25); }
+
+  .plan.featured {
+    border-color: var(--volt-accent);
+    background: linear-gradient(135deg, rgba(200,240,0,0.06), var(--volt-slate));
+  }
+
+  .plan-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--volt-accent); color: var(--volt-dark);
+    font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+    padding: 4px 16px; border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .plan-name {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--volt-mist-dim); margin-bottom: 16px;
+  }
+
+  .plan-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px; font-weight: 800;
+    letter-spacing: -2px; color: var(--volt-mist);
+    line-height: 1;
+  }
+  .plan-price span { font-size: 18px; font-weight: 300; color: var(--volt-mist-dim); }
+
+  .plan-period { font-size: 13px; color: var(--volt-mist-dim); margin: 8px 0 24px; }
+
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .plan-features li {
+    font-size: 13px; font-weight: 300; color: var(--volt-mist-dim);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .plan-features li::before {
+    content: '';
+    width: 16px; height: 16px; flex-shrink: 0;
+    background: var(--volt-accent-dim);
+    border: 1px solid rgba(200,240,0,0.4);
+    border-radius: 50%;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%23C8F000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .plan-btn {
+    display: block; text-align: center;
+    padding: 12px;
+    border-radius: 100px;
+    font-size: 14px; font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+    cursor: none;
+  }
+  .plan-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .plan.featured .plan-btn { background: var(--volt-accent); color: var(--volt-dark); }
+  .plan:not(.featured) .plan-btn {
+    background: transparent;
+    border: 0.5px solid rgba(232,237,242,0.2);
+    color: var(--volt-mist-dim);
+  }
+
+  /* CTA BANNER */
+  .cta-banner {
+    margin: 0 48px 80px;
+    background: var(--volt-accent);
+    border-radius: 24px;
+    padding: 64px 80px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 40px;
+  }
+
+  .cta-banner h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    color: var(--volt-dark);
+    max-width: 480px;
+    line-height: 1.1;
+  }
+
+  .btn-dark {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--volt-dark);
+    color: var(--volt-accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 500;
+    padding: 14px 32px; border-radius: 100px;
+    text-decoration: none; white-space: nowrap;
+    transition: opacity 0.2s;
+    cursor: none;
+  }
+  .btn-dark:hover { opacity: 0.85; }
+
+  /* FOOTER */
+  footer {
+    border-top: 0.5px solid var(--volt-mist-faint);
+    padding: 40px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  footer .logo {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 20px; color: var(--volt-accent);
+    letter-spacing: -1px;
+  }
+
+  footer p {
+    font-size: 13px; font-weight: 300;
+    color: var(--volt-mist-dim);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(32px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; }
+    .hero-visual { display: none; }
+    .section, .ai-section { padding: 64px 24px; }
+    .steps-grid { grid-template-columns: 1fr; gap: 2px; }
+    .step:first-child { border-radius: 16px 16px 0 0; }
+    .step:last-child { border-radius: 0 0 16px 16px; }
+    .ai-grid { grid-template-columns: 1fr; gap: 40px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .cta-banner { margin: 0 24px 60px; padding: 40px 32px; flex-direction: column; }
+    footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">VOLT.</a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#" class="nav-cta">Download app</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">Now available in your city</div>
+    <h1>The city moves<br><em>at your speed.</em></h1>
+    <p class="hero-sub">Unlock a VOLT. scooter in seconds. No subscriptions, no hassle — just scan, ride, and go.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">
+        Get the app
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <a href="#how" class="btn-ghost">
+        See how it works
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 2v10M2 9l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">200+</div><div class="stat-label">Scooters live</div></div>
+      <div class="stat-item"><div class="stat-num">4.9★</div><div class="stat-label">App rating</div></div>
+      <div class="stat-item"><div class="stat-num">₹10</div><div class="stat-label">Per minute</div></div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="scooter-wrap">
+      <svg width="380" height="340" viewBox="0 0 380 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Glow -->
+        <ellipse cx="190" cy="310" rx="120" ry="20" fill="rgba(200,240,0,0.12)"/>
+        <!-- Wheels -->
+        <circle cx="80" cy="274" r="46" stroke="#C8F000" stroke-width="5" fill="none"/>
+        <circle cx="80" cy="274" r="18" fill="rgba(200,240,0,0.15)" stroke="#C8F000" stroke-width="2"/>
+        <circle cx="300" cy="274" r="46" stroke="#C8F000" stroke-width="5" fill="none"/>
+        <circle cx="300" cy="274" r="18" fill="rgba(200,240,0,0.15)" stroke="#C8F000" stroke-width="2"/>
+        <!-- Deck -->
+        <rect x="105" y="248" width="170" height="16" rx="8" fill="#1E2530" stroke="#C8F000" stroke-width="2"/>
+        <!-- Body -->
+        <path d="M120 248 L105 190 L165 150 L215 150 L265 248Z" fill="rgba(30,37,48,0.95)" stroke="#C8F000" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Screen/panel -->
+        <rect x="155" y="158" width="54" height="34" rx="6" fill="rgba(200,240,0,0.1)" stroke="rgba(200,240,0,0.5)" stroke-width="1.5"/>
+        <rect x="163" y="165" width="38" height="20" rx="3" fill="rgba(200,240,0,0.2)"/>
+        <text x="182" y="179" font-family="monospace" font-size="10" fill="#C8F000" text-anchor="middle">4.2km</text>
+        <!-- Stem -->
+        <path d="M215 150 L230 80" stroke="#C8F000" stroke-width="5" stroke-linecap="round"/>
+        <!-- Handlebar -->
+        <path d="M210 80 L280 80" stroke="#C8F000" stroke-width="7" stroke-linecap="round"/>
+        <rect x="205" y="74" width="16" height="14" rx="7" fill="#1E2530" stroke="#C8F000" stroke-width="2"/>
+        <rect x="269" y="74" width="16" height="14" rx="7" fill="#1E2530" stroke="#C8F000" stroke-width="2"/>
+        <!-- Volt accent lines -->
+        <path d="M150 200 L170 200" stroke="rgba(200,240,0,0.35)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M150 212 L175 212" stroke="rgba(200,240,0,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Fork front -->
+        <path d="M105 190 L80 230" stroke="#C8F000" stroke-width="3" stroke-linecap="round"/>
+        <path d="M265 248 L300 230" stroke="#C8F000" stroke-width="3" stroke-linecap="round"/>
+        <!-- Speed lines -->
+        <path d="M30 260 L10 260" stroke="rgba(200,240,0,0.3)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M20 274 L2 274" stroke="rgba(200,240,0,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M35 288 L18 288" stroke="rgba(200,240,0,0.15)" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-tag">
+    <span style="width:20px;height:1px;background:var(--volt-accent);display:inline-block"></span>
+    How it works
+  </div>
+  <h2 class="section-title reveal">Three steps.<br>Zero friction.</h2>
+  <div class="steps-grid reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect x="4" y="2" width="14" height="18" rx="3" stroke="#C8F000" stroke-width="1.5"/>
+          <path d="M8 7h6M8 11h4" stroke="#C8F000" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="11" cy="16" r="1.5" fill="#C8F000"/>
+        </svg>
+      </div>
+      <h3>Download & sign up</h3>
+      <p>Create your account in under 60 seconds. Verify your number and you're ready to roll — no waiting, no paperwork.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M3 5h3V2H3v3zm0 7h3v-3H3v3zm0 7h3v-3H3v3zm7-14h3V2h-3v3zm0 7h3v-3h-3v3zm0 7h3v-3h-3v3zm7-14h3V2h-3v3zm0 7h3v-3h-3v3zm0 7h3v-3h-3v3z" stroke="#C8F000" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <h3>Scan the QR code</h3>
+      <p>Find any VOLT. scooter on the map, walk up to it, and scan the code on the handlebar. The lock releases instantly.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2C6 2 2 6 2 11s4 9 9 9 9-4 9-9-4-9-9-9z" stroke="#C8F000" stroke-width="1.5"/>
+          <path d="M11 7v4l3 3" stroke="#C8F000" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Ride & park anywhere</h3>
+      <p>Cruise at up to 25 km/h, end your ride wherever you like within the zone. Tap "End ride" and you're done. That's it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES + AI COPY -->
+<section class="ai-section" id="features">
+  <div class="ai-grid">
+    <div>
+      <div class="section-tag">
+        <span style="width:20px;height:1px;background:var(--volt-accent);display:inline-block"></span>
+        Why VOLT.
+      </div>
+      <h2 class="section-title reveal" style="font-size: clamp(28px,3.5vw,44px); margin-bottom: 32px;">
+        Built for riders,<br>not bureaucrats.
+      </h2>
+      <div class="ai-copy-block">
+        <div class="ai-loading" id="ai-loading">
+          <div class="ai-dot"></div>
+          <div class="ai-dot"></div>
+          <div class="ai-dot"></div>
+          <span style="font-size:13px; margin-left:4px;">Generating copy with AI…</span>
+        </div>
+        <p id="ai-copy" style="font-size:16px; font-weight:300; line-height:1.8; color:var(--volt-mist-dim); display:none;"></p>
+      </div>
+    </div>
+    <ul class="feature-list reveal">
+      <li class="feature-item">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2v16M2 10h16" stroke="#C8F000" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="10" cy="10" r="8" stroke="#C8F000" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Live map — always fresh</h4>
+          <p>Real-time scooter locations, battery levels, and availability updated every 10 seconds.</p>
+        </div>
+      </li>
+      <li class="feature-item">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 18s-7-5-7-10a7 7 0 0114 0c0 5-7 10-7 10z" stroke="#C8F000" stroke-width="1.5"/>
+            <circle cx="10" cy="8" r="2.5" stroke="#C8F000" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Zone-smart parking</h4>
+          <p>Park within any green zone and get a ₹20 discount on your next ride automatically.</p>
+        </div>
+      </li>
+      <li class="feature-item">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 10l5 5 9-9" stroke="#C8F000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Zero-emission rides</h4>
+          <p>Every VOLT. ride offsets more CO₂ than a car trip. We publish our impact numbers monthly.</p>
+        </div>
+      </li>
+      <li class="feature-item">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="6" width="14" height="10" rx="2" stroke="#C8F000" stroke-width="1.5"/>
+            <path d="M7 6V5a3 3 0 016 0v1" stroke="#C8F000" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h4>Ride insurance included</h4>
+          <p>Every ride is covered. No extra forms, no fine print. Accident support is one tap away.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-tag">
+    <span style="width:20px;height:1px;background:var(--volt-accent);display:inline-block"></span>
+    Pricing
+  </div>
+  <h2 class="section-title reveal">Pay only for<br>what you ride.</h2>
+  <div class="pricing-grid reveal">
+    <div class="plan">
+      <div class="plan-name">Pay as you go</div>
+      <div class="plan-price">₹10<span>/min</span></div>
+      <div class="plan-period">No commitment</div>
+      <ul class="plan-features">
+        <li>Unlock any scooter instantly</li>
+        <li>Basic ride insurance</li>
+        <li>In-app support</li>
+        <li>Zone-smart parking</li>
+      </ul>
+      <a href="#" class="plan-btn">Start riding</a>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">Most popular</div>
+      <div class="plan-name">Day pass</div>
+      <div class="plan-price">₹149<span>/day</span></div>
+      <div class="plan-period">Unlimited rides up to 45 min</div>
+      <ul class="plan-features">
+        <li>Unlimited short rides</li>
+        <li>Premium ride insurance</li>
+        <li>Priority support</li>
+        <li>Parking discounts</li>
+      </ul>
+      <a href="#" class="plan-btn">Get day pass</a>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Monthly</div>
+      <div class="plan-price">₹799<span>/mo</span></div>
+      <div class="plan-period">Best value for daily commuters</div>
+      <ul class="plan-features">
+        <li>60 free minutes daily</li>
+        <li>Full ride insurance</li>
+        <li>24/7 priority support</li>
+        <li>Free helmet rental</li>
+      </ul>
+      <a href="#" class="plan-btn">Go monthly</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<div class="cta-banner reveal">
+  <h2>Your next ride is 30 seconds away.</h2>
+  <a href="#" class="btn-dark">
+    Download VOLT.
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">VOLT.</div>
+  <p>© 2025 VOLT. Technologies Pvt. Ltd. — Ahmedabad, India</p>
+  <p style="font-size:12px; color:rgba(232,237,242,0.25);">Built with zero emissions, obviously.</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // AI copy generation
+  async function generateCopy() {
+    const loading = document.getElementById('ai-loading');
+    const copyEl = document.getElementById('ai-copy');
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: `Write a short, punchy 3-sentence brand paragraph for VOLT., an electric scooter rental startup, an electric scooter rental startup based in Indian cities. Brand voice: bold, youthful, urban, no-fluff. Tone is like a cool city brand — not corporate. Focus on freedom, speed, and sustainability. No lists, no headers. Just 3 tight sentences that flow together. Do not start with "VOLT."`,
+          }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text || '';
+      loading.style.display = 'none';
+      copyEl.style.display = 'block';
+      // Typewriter effect
+      let i = 0;
+      copyEl.textContent = '';
+      function type() {
+        if (i < text.length) {
+          copyEl.textContent += text[i++];
+          setTimeout(type, 18);
+        }
+      }
+      type();
+    } catch (err) {
+      loading.style.display = 'none';
+      copyEl.style.display = 'block';
+      copyEl.textContent = 'Cities weren\'t built for traffic jams — they were built for movement. VOLT. puts an electric scooter at your fingertips wherever you are, whenever you need it. Clean, quiet, and faster than a rickshaw in peak hour.';
+    }
+  }
+
+  // Trigger AI copy when features section enters view
+  const aiSection = document.querySelector('.ai-section');
+  let aiTriggered = false;
+  const aiObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !aiTriggered) {
+      aiTriggered = true;
+      generateCopy();
+    }
+  }, { threshold: 0.2 });
+  aiObserver.observe(aiSection);
+</script>
+</body>
+</html>
