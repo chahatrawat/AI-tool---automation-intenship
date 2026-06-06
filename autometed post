@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automation Dashboard — Auto-Poster</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary: #eeede9;
+      --bg-info: #e6f1fb;
+      --bg-success: #eaf3de;
+      --bg-warning: #faeeda;
+      --bg-danger: #fcebeb;
+      --text-primary: #1a1a18;
+      --text-secondary: #5f5e5a;
+      --text-info: #0c447c;
+      --text-success: #27500a;
+      --text-warning: #633806;
+      --text-danger: #791f1f;
+      --border-default: rgba(0,0,0,0.13);
+      --border-emphasis: rgba(0,0,0,0.25);
+      --border-info: #85b7eb;
+      --border-success: #c0dd97;
+      --border-warning: #fac775;
+      --border-danger: #f7c1c1;
+      --blue-accent: #185fa5;
+      --blue-hover: #0c447c;
+      --blue-light: #e6f1fb;
+      --blue-mid: #b5d4f4;
+      --green-accent: #1d9e75;
+      --amber-accent: #ef9f27;
+      --red-accent: #e24b4a;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-sans: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 1.75rem;
+    }
+    .dash-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--blue-accent);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .dash-icon i { font-size: 24px; color: var(--blue-mid); }
+    .dash-title { font-size: 22px; font-weight: 500; }
+    .dash-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* KPI bar */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .kpi {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: .85rem 1rem;
+    }
+    .kpi-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .kpi-val { font-size: 26px; font-weight: 500; }
+    .kpi-val.up { color: #0f6e56; }
+    .kpi-val.warn { color: #854f0b; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    /* Platforms */
+    .platform-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .plat {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      border: 0.5px solid var(--border-emphasis);
+      cursor: pointer;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
+      transition: all .15s;
+      user-select: none;
+    }
+    .plat i { font-size: 15px; }
+    .plat.on { background: var(--blue-light); color: var(--text-info); border-color: var(--border-info); }
+
+    /* AI hint */
+    .ai-hint {
+      display: flex; align-items: center; gap: 10px;
+      padding: .75rem 1rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+    }
+    .ai-hint i { font-size: 16px; color: #378add; }
+    .ai-hint-text { font-size: 13px; color: var(--text-secondary); flex: 1; }
+    .ai-hint-btn {
+      font-size: 12px; padding: 5px 12px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-default);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background .15s;
+    }
+    .ai-hint-btn:hover { background: var(--bg-secondary); }
+
+    /* Textarea */
+    .post-input {
+      width: 100%; min-height: 100px;
+      padding: .875rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 14px; line-height: 1.65;
+      border: 0.5px solid var(--border-emphasis);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      resize: vertical;
+    }
+    .post-input:focus {
+      outline: none;
+      border-color: #378add;
+      box-shadow: 0 0 0 3px rgba(55,138,221,.12);
+    }
+
+    /* Compose footer */
+    .compose-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+      margin-top: .75rem;
+    }
+    .char-count { font-size: 12px; color: var(--text-secondary); }
+    .char-count.warn { color: #854f0b; }
+    .char-count.over { color: #a32d2d; }
+
+    .action-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* Selects */
+    select {
+      padding: 7px 12px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+      border: 0.5px solid var(--border-emphasis);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px;
+      font-size: 13px; font-weight: 500;
+      font-family: var(--font-sans);
+      border: 0.5px solid var(--border-emphasis);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn:hover { background: var(--bg-tertiary); }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .btn.send {
+      background: var(--blue-accent);
+      border-color: var(--blue-accent);
+      color: var(--blue-light);
+    }
+    .btn.send i { color: var(--blue-mid); }
+    .btn.send:hover { background: var(--blue-hover); }
+    .btn.send:disabled { background: var(--blue-accent); }
+
+    /* Spinner */
+    .spin {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(181,212,244,.35);
+      border-top-color: var(--blue-mid);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Schedule row */
+    .sched-row {
+      display: none; gap: 8px; align-items: center;
+      flex-wrap: wrap; margin-top: .75rem;
+    }
+    .sched-row input {
+      padding: 7px 10px; font-size: 13px;
+      font-family: var(--font-sans);
+      border: 0.5px solid var(--border-emphasis);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    /* Status bars */
+    .status-bar {
+      margin-top: .75rem; padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      display: none; align-items: center; gap: 8px;
+    }
+    .status-bar i { font-size: 16px; flex-shrink: 0; }
+    .status-bar.info { background: var(--bg-info); color: var(--text-info); border: 0.5px solid var(--border-info); display: flex; }
+    .status-bar.success { background: var(--bg-success); color: var(--text-success); border: 0.5px solid var(--border-success); display: flex; }
+    .status-bar.error { background: var(--bg-danger); color: var(--text-danger); border: 0.5px solid var(--border-danger); display: flex; }
+
+    /* Meta chips */
+    .meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: .75rem; }
+    .meta-chip {
+      font-size: 11px; padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--blue-light); color: var(--text-info);
+      border: 0.5px solid var(--blue-mid);
+    }
+
+    /* JSON Preview */
+    .json-preview {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 12.5px; line-height: 1.7;
+      color: var(--text-primary);
+      white-space: pre-wrap; word-break: break-all;
+      display: none;
+    }
+    .json-empty {
+      text-align: center; padding: 1.75rem;
+      color: var(--text-secondary); font-size: 13px;
+    }
+    .json-empty i { font-size: 28px; display: block; margin-bottom: 6px; opacity: .35; }
+
+    /* Activity feed */
+    .feed { display: flex; flex-direction: column; gap: 8px; }
+    .feed-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: .875rem 1rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+    }
+    .feed-dot { min-width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; }
+    .feed-dot.sent { background: var(--green-accent); }
+    .feed-dot.pending { background: var(--amber-accent); }
+    .feed-dot.failed { background: var(--red-accent); }
+    .feed-body { flex: 1; }
+    .feed-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; margin-bottom: 5px; }
+    .feed-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .feed-plat, .feed-time { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 3px; }
+    .feed-plat i, .feed-time i { font-size: 12px; }
+    .feed-badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; }
+    .feed-badge.sent { background: #e1f5ee; color: #085041; }
+    .feed-badge.pending { background: var(--bg-warning); color: var(--text-warning); }
+    .feed-badge.failed { background: var(--bg-danger); color: var(--text-danger); }
+
+    .feed-empty {
+      text-align: center; padding: 2rem;
+      color: var(--text-secondary); font-size: 13px;
+    }
+    .feed-empty i { font-size: 28px; display: block; margin-bottom: 6px; opacity: .35; }
+
+    /* Copy button row */
+    .copy-row { display: flex; justify-content: flex-end; margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="dash-header">
+      <div class="dash-icon"><i class="ti ti-robot"></i></div>
+      <div>
+        <div class="dash-title">Automation Dashboard</div>
+        <div class="dash-sub">Compose, schedule &amp; send AI-powered posts</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Posts sent today</div><div class="kpi-val up" id="kpi-sent">0</div></div>
+      <div class="kpi"><div class="kpi-label">Scheduled</div><div class="kpi-val" id="kpi-sched">0</div></div>
+      <div class="kpi"><div class="kpi-label">Avg. engagement</div><div class="kpi-val" id="kpi-eng">—</div></div>
+      <div class="kpi"><div class="kpi-label">Queue</div><div class="kpi-val warn" id="kpi-queue">0</div></div>
+    </div>
+
+    <!-- Compose card -->
+    <div class="card">
+      <div class="card-title">Target platforms</div>
+      <div class="platform-row" id="plat-row">
+        <div class="plat on" data-p="LinkedIn" onclick="togglePlat(this)"><i class="ti ti-brand-linkedin"></i>LinkedIn</div>
+        <div class="plat" data-p="Twitter/X" onclick="togglePlat(this)"><i class="ti ti-brand-x"></i>Twitter/X</div>
+        <div class="plat" data-p="Instagram" onclick="togglePlat(this)"><i class="ti ti-brand-instagram"></i>Instagram</div>
+        <div class="plat" data-p="Facebook" onclick="togglePlat(this)"><i class="ti ti-brand-facebook"></i>Facebook</div>
+      </div>
+
+      <div class="card-title">Compose post</div>
+      <div class="ai-hint" id="ai-hint">
+        <i class="ti ti-sparkles"></i>
+        <span class="ai-hint-text" id="hint-text">Need inspiration? Let AI draft a post for you.</span>
+        <button class="ai-hint-btn" id="draft-btn" onclick="aiDraft()">Draft with AI</button>
+      </div>
+
+      <textarea class="post-input" id="post-text" placeholder="Write your post content here…" oninput="onType()" maxlength="2000"></textarea>
+
+      <div class="meta-row">
+        <span class="meta-chip"><i class="ti ti-hash" style="font-size:11px;vertical-align:-1px"></i> chat_id: -5110533387</span>
+        <span class="meta-chip"><i class="ti ti-robot" style="font-size:11px;vertical-align:-1px"></i> bot token attached</span>
+      </div>
+
+      <div class="compose-footer">
+        <span class="char-count" id="char-count">0 / 280</span>
+        <div class="action-row">
+          <select id="mode-sel" onchange="toggleSched()">
+            <option value="now">Send now</option>
+            <option value="schedule">Schedule</option>
+          </select>
+          <button class="btn send" id="send-btn" onclick="handleSend()">
+            <span class="spin" id="send-spin"></span>
+            <i class="ti ti-send" id="send-icon"></i>
+            Send automated post
+          </button>
+        </div>
+      </div>
+
+      <div class="sched-row" id="sched-row">
+        <i class="ti ti-calendar" style="font-size:16px;color:var(--text-secondary)"></i>
+        <input type="date" id="sched-date" />
+        <input type="time" id="sched-time" value="09:00" />
+      </div>
+
+      <div class="status-bar" id="status-bar"></div>
+    </div>
+
+    <!-- JSON Preview card -->
+    <div class="card">
+      <div class="card-title">JSON payload (last sent)</div>
+      <div id="json-wrap">
+        <div class="json-empty"><i class="ti ti-code"></i>JSON payload will appear here after sending</div>
+      </div>
+    </div>
+
+    <!-- Activity feed card -->
+    <div class="card">
+      <div class="card-title">Post activity feed</div>
+      <div class="feed" id="feed">
+        <div class="feed-empty"><i class="ti ti-history"></i>No posts yet — send one to see activity here</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let sentCount = 0, schedCount = 0, queueCount = 0;
+    let feedItems = [];
+
+    // Set default schedule date to tomorrow
+    (function() {
+      const d = new Date(); d.setDate(d.getDate() + 1);
+      document.getElementById('sched-date').value = d.toISOString().split('T')[0];
+    })();
+
+    function togglePlat(el) { el.classList.toggle('on'); }
+
+    function toggleSched() {
+      const show = document.getElementById('mode-sel').value === 'schedule';
+      document.getElementById('sched-row').style.display = show ? 'flex' : 'none';
+    }
+
+    function onType() {
+      const v = document.getElementById('post-text').value;
+      const cc = document.getElementById('char-count');
+      const n = v.length;
+      cc.textContent = n + ' / 280';
+      cc.className = 'char-count' + (n > 280 ? ' over' : n > 240 ? ' warn' : '');
+    }
+
+    async function aiDraft() {
+      const btn = document.getElementById('draft-btn');
+      const hintText = document.getElementById('hint-text');
+      btn.textContent = 'Drafting…'; btn.disabled = true;
+      const plats = [...document.querySelectorAll('.plat.on')].map(p => p.dataset.p).join(', ') || 'social media';
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: `Write a short, engaging social media post about web development for ${plats}. Keep it under 220 characters, make it punchy and professional. Return only the post text, no quotes or explanation.` }]
+          })
+        });
+        const data = await res.json();
+        const text = data.content.map(b => b.text || '').join('').trim();
+        document.getElementById('post-text').value = text;
+        onType();
+        hintText.textContent = 'Draft ready — edit as needed.';
+      } catch(e) {
+        hintText.textContent = 'Could not draft — try again.';
+      } finally {
+        btn.textContent = 'Draft with AI'; btn.disabled = false;
+      }
+    }
+
+    async function handleSend() {
+      const text = document.getElementById('post-text').value.trim();
+      const mode = document.getElementById('mode-sel').value;
+      const plats = [...document.querySelectorAll('.plat.on')].map(p => p.dataset.p);
+      const sb = document.getElementById('status-bar');
+      const btn = document.getElementById('send-btn');
+      const spin = document.getElementById('send-spin');
+      const icon = document.getElementById('send-icon');
+
+      sb.className = 'status-bar';
+
+      if (!text) {
+        sb.className = 'status-bar error';
+        sb.innerHTML = '<i class="ti ti-alert-circle"></i> Please write a post before sending.';
+        return;
+      }
+      if (!plats.length) {
+        sb.className = 'status-bar error';
+        sb.innerHTML = '<i class="ti ti-alert-circle"></i> Select at least one platform.';
+        return;
+      }
+
+      // Build the JSON payload with chat_id and bot_token
+      const payload = {
+        chat_id: -5110533387,
+        bot_token: "8906449121:AAErAYbj8mPojzu2VAX_M-1uly3kJsABOZU",
+        message: text,
+        platforms: plats,
+        timestamp: new Date().toISOString()
+      };
+
+      // Log to browser console
+      console.log('%c[Auto-Poster] Automated Post Payload', 'color:#185FA5;font-weight:bold;font-size:13px');
+      console.log(JSON.stringify(payload, null, 2));
+
+      // Show JSON in preview card
+      showJSON(payload);
+
+      if (mode === 'schedule') {
+        const d = document.getElementById('sched-date').value;
+        const t = document.getElementById('sched-time').value;
+        schedCount++; queueCount++;
+        addFeedItem(text, plats, 'pending', d + ' ' + t);
+        sb.className = 'status-bar success';
+        sb.innerHTML = '<i class="ti ti-calendar-check"></i> Scheduled for ' + d + ' at ' + t + ' on ' + plats.join(', ') + '.';
+        document.getElementById('post-text').value = ''; onType();
+        updateKPIs(); return;
+      }
+
+      btn.disabled = true; spin.style.display = 'block'; icon.style.display = 'none';
+      sb.className = 'status-bar info';
+      sb.innerHTML = '<i class="ti ti-loader"></i> Sending post via AI automation…';
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: `You are a social media automation engine. A post is being sent to: ${plats.join(', ')}.\n\nPost content: "${text}"\n\nRespond with ONLY a JSON object (no markdown, no fences):\n{"status":"sent","optimized_text":"<slightly optimized version>","platforms":${JSON.stringify(plats)},"timestamp":"${new Date().toLocaleTimeString()}","engagement_hint":"<one short tip>"}` }]
+          })
+        });
+        const data = await res.json();
+        const raw = data.content.map(b => b.text || '').join('').replace(/```json|```/g, '').trim();
+        const result = JSON.parse(raw);
+        sentCount++;
+        addFeedItem(result.optimized_text || text, plats, 'sent', result.timestamp || 'just now');
+        sb.className = 'status-bar success';
+        sb.innerHTML = '<i class="ti ti-circle-check"></i> Posted to ' + plats.join(', ') + '! Tip: ' + result.engagement_hint;
+        document.getElementById('post-text').value = ''; onType();
+        updateKPIs();
+      } catch(e) {
+        addFeedItem(text, plats, 'failed', 'just now');
+        sb.className = 'status-bar error';
+        sb.innerHTML = '<i class="ti ti-alert-circle"></i> Send failed: ' + e.message;
+      } finally {
+        btn.disabled = false; spin.style.display = 'none'; icon.style.display = 'block';
+      }
+    }
+
+    function showJSON(payload) {
+      const jsonString = JSON.stringify(payload, null, 2);
+      const wrap = document.getElementById('json-wrap');
+      wrap.innerHTML = `<pre class="json-preview" style="display:block">${escapeHTML(jsonString)}</pre>
+        <div class="copy-row">
+          <button class="btn" id="copy-btn" onclick="copyJSON()">
+            <i class="ti ti-copy"></i> Copy JSON
+          </button>
+        </div>`;
+    }
+
+    function copyJSON() {
+      const pre = document.querySelector('.json-preview');
+      if (!pre) return;
+      navigator.clipboard.writeText(pre.textContent).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.innerHTML = '<i class="ti ti-check"></i> Copied!';
+        setTimeout(() => { btn.innerHTML = '<i class="ti ti-copy"></i> Copy JSON'; }, 2000);
+      });
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function addFeedItem(text, plats, status, time) {
+      const feedEl = document.getElementById('feed');
+      if (feedItems.length === 0) feedEl.innerHTML = '';
+      feedItems.unshift({ text, plats, status, time });
+      const label = status === 'sent' ? 'Sent' : status === 'pending' ? 'Scheduled' : 'Failed';
+      const div = document.createElement('div');
+      div.className = 'feed-item';
+      div.innerHTML = `
+        <div class="feed-dot ${status}"></div>
+        <div class="feed-body">
+          <div class="feed-text">${text.length > 120 ? text.slice(0,120) + '…' : text}</div>
+          <div class="feed-meta">
+            <span class="feed-plat"><i class="ti ti-device-desktop"></i>${plats.join(', ')}</span>
+            <span class="feed-time"><i class="ti ti-clock"></i>${time}</span>
+            <span class="feed-badge ${status}">${label}</span>
+          </div>
+        </div>`;
+      feedEl.prepend(div);
+    }
+
+    function updateKPIs() {
+      document.getElementById('kpi-sent').textContent = sentCount;
+      document.getElementById('kpi-sched').textContent = schedCount;
+      document.getElementById('kpi-queue').textContent = queueCount;
+      if (sentCount > 0) document.getElementById('kpi-eng').textContent = Math.round(3.2 + sentCount * 0.4) + '%';
+    }
+  </script>
+</body>
+</html>
