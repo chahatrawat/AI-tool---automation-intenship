@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Payment Form</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+    radial-gradient(circle at top left,#2563eb33,transparent 35%),
+    radial-gradient(circle at bottom right,#7c3aed33,transparent 35%),
+    #050816;
+    padding:20px;
+}
+
+/* Animated Border Container */
+.payment-container{
+    position:relative;
+    width:100%;
+    max-width:500px;
+    border-radius:24px;
+    padding:2px;
+    overflow:hidden;
+}
+
+.payment-container::before{
+    content:"";
+    position:absolute;
+    inset:-100%;
+    background:conic-gradient(
+        from 0deg,
+        #3b82f6,
+        #8b5cf6,
+        #06b6d4,
+        #3b82f6
+    );
+    animation:rotateBorder 5s linear infinite;
+}
+
+@keyframes rotateBorder{
+    100%{
+        transform:rotate(360deg);
+    }
+}
+
+.payment-card{
+    position:relative;
+    background:rgba(10,15,35,0.95);
+    backdrop-filter:blur(20px);
+    border-radius:22px;
+    padding:35px;
+    z-index:1;
+    color:white;
+}
+
+.logo{
+    width:60px;
+    height:60px;
+    border-radius:15px;
+    background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    margin-bottom:20px;
+    box-shadow:0 0 25px rgba(59,130,246,.5);
+}
+
+h2{
+    margin-bottom:8px;
+    font-size:28px;
+}
+
+.subtitle{
+    color:#94a3b8;
+    margin-bottom:30px;
+}
+
+.form-group{
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);
+    border-radius:14px;
+    color:white;
+    font-size:16px;
+    outline:none;
+    transition:0.3s;
+}
+
+input:focus{
+    border-color:#3b82f6;
+    box-shadow:0 0 20px rgba(59,130,246,0.25);
+}
+
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    margin-top:10px;
+}
+
+button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(59,130,246,.4);
+}
+
+button:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.error{
+    color:#f87171;
+    font-size:13px;
+    margin-top:6px;
+    display:none;
+}
+
+.secure-note{
+    margin-top:18px;
+    text-align:center;
+    color:#94a3b8;
+    font-size:13px;
+}
+
+.lock{
+    color:#22c55e;
+    margin-right:5px;
+}
+
+@media(max-width:520px){
+    .payment-card{
+        padding:25px;
+    }
+
+    .row{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="payment-container">
+    <div class="payment-card">
+
+        <div class="logo">💳</div>
+
+        <h2>secure Payment</h2>
+        <p class="subtitle">Protected financial transaction portal</p>
+
+        <form id="paymentForm">
+
+            <div class="form-group">
+                <label>Cardholder Name</label>
+                <input
+                    type="text"
+                    id="cardName"
+                    placeholder="John Smith"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label>Card Number</label>
+                <input
+                    type="text"
+                    id="cardNumber"
+                    placeholder="1234 5678 9012 3456"
+                    maxlength="19"
+                    required>
+                <div class="error" id="cardError">
+                    Card number must contain exactly 16 digits.
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Expiry Date</label>
+                    <input
+                        type="text"
+                        placeholder="MM/YY"
+                        maxlength="5"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>CVV</label>
+                    <input
+                        type="password"
+                        maxlength="3"
+                        pattern="[0-9]{3}"
+                        placeholder="123"
+                        required>
+                </div>
+            </div>
+
+            <button type="submit" id="payBtn">
+                Pay Securely
+            </button>
+
+        </form>
+
+        <div class="secure-note">
+            <span class="lock">🔒</span>
+            256-bit encrypted payment processing
+        </div>
+
+    </div>
+</div>
+
+<script>
+const cardInput = document.getElementById("cardNumber");
+const cardError = document.getElementById("cardError");
+const paymentForm = document.getElementById("paymentForm");
+
+/* Auto-format card number with spaces every 4 digits */
+cardInput.addEventListener("input", function(e){
+
+    let value = e.target.value.replace(/\D/g, "");
+
+    value = value.substring(0,16);
+
+    value = value.replace(/(.{4})/g, "$1 ").trim();
+
+    e.target.value = value;
+
+    validateCard();
+});
+
+/* Validate card number */
+function validateCard(){
+
+    const digits = cardInput.value.replace(/\s/g, "");
+
+    if(digits.length === 16){
+        cardError.style.display = "none";
+        return true;
+    }else{
+        cardError.style.display = "block";
+        return false;
+    }
+}
+
+/* Prevent submission if not exactly 16 digits */
+paymentForm.addEventListener("submit", function(e){
+
+    const digits = cardInput.value.replace(/\s/g, "");
+
+    if(digits.length !== 16){
+        e.preventDefault();
+        cardError.style.display = "block";
+        cardInput.focus();
+        return;
+    }
+
+    e.preventDefault();
+
+    alert("Payment validated successfully!");
+});
+</script>
+
+</body>
+</html>
