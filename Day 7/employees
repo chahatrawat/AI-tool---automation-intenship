@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Table</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:Arial, sans-serif;
+    }
+
+    body{
+        background:linear-gradient(135deg,#0f172a,#1e293b);
+        min-height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        padding:20px;
+    }
+
+    .container{
+        width:100%;
+        max-width:1000px;
+        background:#ffffff;
+        border-radius:15px;
+        padding:25px;
+        box-shadow:0 15px 35px rgba(0,0,0,0.3);
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:20px;
+        color:#0f172a;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+        overflow:hidden;
+        border-radius:10px;
+    }
+
+    thead{
+        background:#2563eb;
+        color:white;
+    }
+
+    th, td{
+        padding:14px 16px;
+        text-align:left;
+        border-bottom:1px solid #e5e7eb;
+    }
+
+    tbody tr:nth-child(even){
+        background:#f8fafc;
+    }
+
+    tbody tr:hover{
+        background:#dbeafe;
+        transition:0.3s;
+    }
+
+    th{
+        font-weight:600;
+        letter-spacing:0.5px;
+    }
+
+    .salary{
+        font-weight:bold;
+        color:#16a34a;
+    }
+
+    @media(max-width:768px){
+        table{
+            font-size:14px;
+        }
+
+        th, td{
+            padding:10px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Employee Details</h1>
+
+    <table id="employeeTable">
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Salary ($)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows inserted via JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+const employees = [
+    {
+        "empId": 101,
+        "name": "Aditya Sharma",
+        "department": "Information Technology",
+        "salary": 65000
+    },
+    {
+        "empId": 102,
+        "name": "Priya Patel",
+        "department": "Human Resources",
+        "salary": 58000
+    },
+    {
+        "empId": 103,
+        "name": "Ronak Mehta",
+        "department": "Finance",
+        "salary": 72000
+    },
+    {
+        "empId": 104,
+        "name": "Neha Verma",
+        "department": "Marketing",
+        "salary": 61000
+    },
+    {
+        "empId": 105,
+        "name": "Karan Singh",
+        "department": "Operations",
+        "salary": 69000
+    }
+];
+
+const tbody = document.querySelector("#employeeTable tbody");
+
+employees.forEach(employee => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${employee.empId}</td>
+        <td>${employee.name}</td>
+        <td>${employee.department}</td>
+        <td class="salary">${employee.salary.toLocaleString()}</td>
+    `;
+
+    tbody.appendChild(row);
+});
+</script>
+
+</body>
+</html>
