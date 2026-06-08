@@ -1,0 +1,20 @@
+<!-- Define an empty list -->
+<ul id="fruitList"></ul>
+
+<script>
+
+    // Create an array of fruit names
+    const fruits = ["Apple", "Banana", "Orange"];
+
+    // Get the UL element from the page
+    const list = document.getElementById("fruitList");
+
+    // Loop through each fruit in the array
+    for (let i = 0; i < fruits.length; i++) {
+
+        // Add a new list item containing the fruit name
+        list.innerHTML += "<li>" + fruits[i] + "</li>";
+
+    }
+
+</script>
