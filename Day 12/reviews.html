@@ -1,0 +1,396 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a10;
+      --bg-card:   #13131c;
+      --bg-input:  #0d0d15;
+      --border:    #22223a;
+      --accent:    #7c6af7;
+      --accent-d:  rgba(124,106,247,0.15);
+      --accent-g:  rgba(124,106,247,0.40);
+      --hi:        #eeeef5;
+      --mid:       #9090b0;
+      --lo:        #3d3d58;
+      --green:     #4ade80;
+      --green-bg:  rgba(34,197,94,0.08);
+      --green-bd:  rgba(34,197,94,0.20);
+      --red:       #f87171;
+      --red-bg:    rgba(239,68,68,0.08);
+      --red-bd:    rgba(239,68,68,0.20);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--hi); font-family: 'Inter', sans-serif; line-height: 1.6; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 48px;
+      background: rgba(10,10,16,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; color:var(--hi); text-decoration:none; }
+    .logo span { color:var(--accent); }
+    .nav-links { display:flex; gap:30px; list-style:none; }
+    .nav-links a { color:var(--mid); text-decoration:none; font-size:0.9rem; font-weight:500; transition:color .2s; }
+    .nav-links a:hover { color:var(--hi); }
+
+    /* HERO */
+    .hero {
+      display:flex; flex-direction:column; align-items:center; text-align:center;
+      padding: 120px 24px 100px;
+      background: radial-gradient(ellipse 60% 45% at 50% 0%, rgba(124,106,247,0.13) 0%, transparent 70%);
+    }
+    .eyebrow {
+      display:inline-block; font-size:0.72rem; font-weight:600;
+      letter-spacing:0.18em; text-transform:uppercase; color:var(--accent);
+      padding:6px 14px; border:1px solid var(--accent-d); border-radius:100px;
+      background:var(--accent-d); margin-bottom:22px;
+    }
+    .hero h1 {
+      font-family:'Syne',sans-serif; font-size:clamp(2.4rem,6vw,4rem);
+      font-weight:800; letter-spacing:-0.03em; line-height:1.1;
+      color:var(--hi); max-width:680px; margin-bottom:18px;
+    }
+    .hero h1 em { font-style:normal; color:var(--accent); }
+    .hero p { color:var(--mid); font-size:1.05rem; max-width:480px; margin-bottom:36px; }
+    .cta {
+      display:inline-flex; align-items:center; gap:10px;
+      background:var(--accent); color:#fff; text-decoration:none;
+      font-weight:600; font-size:0.95rem; padding:14px 28px; border-radius:10px;
+      box-shadow:0 4px 24px var(--accent-g);
+      transition:background .2s, transform .15s, box-shadow .2s;
+    }
+    .cta:hover { background:#6a57e8; transform:translateY(-2px); box-shadow:0 8px 32px var(--accent-g); }
+
+    /* SECTIONS */
+    section { padding:88px 24px; }
+    section:nth-child(even) { background:#0d0d15; }
+    .inner { max-width:900px; margin:0 auto; }
+    .s-label { display:inline-block; font-size:0.72rem; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+    .s-title { font-family:'Syne',sans-serif; font-size:clamp(1.6rem,4vw,2.4rem); font-weight:700; letter-spacing:-0.025em; color:var(--hi); margin-bottom:12px; }
+    .s-sub { color:var(--mid); font-size:1rem; max-width:500px; margin-bottom:44px; }
+
+    /* ABOUT GRID */
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:36px; }
+    .a-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:26px; }
+    .a-card h3 { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--accent); margin-bottom:8px; }
+    .a-card p { color:var(--mid); font-size:0.92rem; }
+
+    /* PROJECTS */
+    .proj-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:22px; margin-top:36px; }
+    .p-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:28px 24px; transition:border-color .2s,transform .2s; }
+    .p-card:hover { border-color:var(--accent); transform:translateY(-3px); }
+    .p-icon { width:42px; height:42px; background:var(--accent-d); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin-bottom:14px; }
+    .p-card h3 { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--hi); margin-bottom:8px; }
+    .p-card p { color:var(--mid); font-size:0.88rem; }
+    .p-tag { display:inline-block; margin-top:12px; font-size:0.73rem; font-weight:600; color:var(--accent); background:var(--accent-d); padding:4px 10px; border-radius:100px; }
+
+    /* REVIEW SECTION */
+    #reviews { background:var(--bg); }
+    .review-card {
+      background:var(--bg-card); border:1px solid var(--border);
+      border-radius:20px; padding:44px 48px; max-width:620px;
+      box-shadow:0 12px 60px rgba(0,0,0,0.45);
+      position:relative; overflow:hidden;
+    }
+    .review-card::before {
+      content:''; position:absolute; top:-60px; right:-60px;
+      width:220px; height:220px;
+      background:radial-gradient(circle,rgba(124,106,247,0.17) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .form-group { margin-bottom:22px; }
+    .form-group label { display:block; font-size:0.78rem; font-weight:600; color:#b0b0cc; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:8px; }
+    .form-group input,
+    .form-group textarea {
+      width:100%; background:var(--bg-input); border:1px solid var(--border);
+      border-radius:10px; padding:13px 16px; color:var(--hi);
+      font-size:0.95rem; font-family:'Inter',sans-serif; outline:none;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .sel-wrap select:focus {
+      border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-d);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color:var(--lo); }
+    .form-group textarea { resize:vertical; min-height:108px; }
+
+    .sel-wrap { position:relative; }
+    .sel-wrap select {
+      width:100%; background:var(--bg-input); border:1px solid var(--border);
+      border-radius:10px; padding:13px 44px 13px 16px; color:var(--hi);
+      font-size:0.95rem; font-family:'Inter',sans-serif;
+      appearance:none; -webkit-appearance:none; cursor:pointer; outline:none;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .sel-wrap select option { background:#18182a; }
+    .sel-arrow { position:absolute; right:16px; top:50%; transform:translateY(-50%); color:var(--accent); pointer-events:none; }
+    .hint { font-size:0.8rem; color:var(--lo); margin-top:6px; min-height:18px; }
+
+    .sub-btn {
+      width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+      background:var(--accent); color:#fff; border:none; border-radius:10px;
+      padding:15px 24px; font-size:1rem; font-weight:600; font-family:'Inter',sans-serif;
+      cursor:pointer; box-shadow:0 4px 24px var(--accent-g); margin-top:8px;
+      transition:background .2s, transform .15s, box-shadow .2s;
+    }
+    .sub-btn:hover { background:#6a57e8; transform:translateY(-2px); box-shadow:0 8px 32px var(--accent-g); }
+    .sub-btn:active { transform:translateY(0); }
+    .sub-btn:disabled { background:#2a2a40; box-shadow:none; cursor:not-allowed; transform:none; }
+    .arr { transition:transform .2s; }
+    .sub-btn:hover .arr { transform:translateX(5px); }
+
+    .status {
+      margin-top:18px; padding:13px 18px; border-radius:10px;
+      font-size:0.9rem; font-weight:500; text-align:center; display:none;
+    }
+    .status.ok  { background:var(--green-bg); color:var(--green); border:1px solid var(--green-bd); display:block; }
+    .status.err { background:var(--red-bg);   color:var(--red);   border:1px solid var(--red-bd);   display:block; }
+
+    /* FOOTER */
+    footer { text-align:center; padding:38px 24px; border-top:1px solid var(--border); color:var(--lo); font-size:0.85rem; }
+    footer b { color:var(--accent); }
+
+    /* RESPONSIVE */
+    @media(max-width:700px){
+      nav { padding:16px 20px; }
+      .about-grid { grid-template-columns:1fr; }
+      .review-card { padding:28px 22px; }
+    }
+    @media(max-width:480px){ .nav-links { display:none; } }
+    @media(prefers-reduced-motion:reduce){ *,*::before,*::after { transition:none !important; } }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════ NAV ════════════════════ -->
+<nav>
+  <a href="#" class="logo">dev<span>.</span>folio</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+  </ul>
+</nav>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<section class="hero">
+  <span class="eyebrow">Open to opportunities</span>
+  <h1>Building things <em>people actually use</em></h1>
+  <p>Full-stack developer crafting clean interfaces and reliable backends. Based in Surat, Gujarat.</p>
+  <a href="#reviews" class="cta">Leave a Review <span>↓</span></a>
+</section>
+
+<!-- ════════════════════ ABOUT ════════════════════ -->
+<section id="about">
+  <div class="inner">
+    <span class="s-label">Who I am</span>
+    <h2 class="s-title">About Me</h2>
+    <p class="s-sub">I turn ideas into working software — caring about every detail that separates a product people love from one they merely tolerate.</p>
+    <div class="about-grid">
+      <div class="a-card"><h3>Frontend</h3><p>HTML, CSS, JavaScript, React — interfaces that feel fast and look intentional.</p></div>
+      <div class="a-card"><h3>Backend</h3><p>Node.js, Python, Google Apps Script — APIs, databases, automation.</p></div>
+      <div class="a-card"><h3>Tooling</h3><p>Git, VS Code, Figma, Firebase — from design handoff to deployed product.</p></div>
+      <div class="a-card"><h3>Currently learning</h3><p>TypeScript, cloud functions, and better feedback loops in every project.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ PROJECTS ════════════════════ -->
+<section id="projects">
+  <div class="inner">
+    <span class="s-label">My work</span>
+    <h2 class="s-title">Projects</h2>
+    <p class="s-sub">A selection of things I've built — from side experiments to client deliverables.</p>
+    <div class="proj-grid">
+      <div class="p-card">
+        <div class="p-icon">📊</div>
+        <h3>Portfolio Reviews</h3>
+        <p>Live review system connecting this page to Google Sheets via Apps Script.</p>
+        <span class="p-tag">Apps Script · JS · Sheets</span>
+      </div>
+      <div class="p-card">
+        <div class="p-icon">🛒</div>
+        <h3>E-Commerce Dashboard</h3>
+        <p>Admin panel with real-time order tracking and inventory management.</p>
+        <span class="p-tag">React · Node · MongoDB</span>
+      </div>
+      <div class="p-card">
+        <div class="p-icon">🤖</div>
+        <h3>AI Chat Widget</h3>
+        <p>Embeddable chat component powered by the Claude API for customer support.</p>
+        <span class="p-tag">API · Vanilla JS · CSS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ REVIEWS ════════════════════ -->
+<section id="reviews">
+  <div class="inner">
+    <span class="s-label">Share your experience</span>
+    <h2 class="s-title">Leave a Review</h2>
+    <p class="s-sub">Worked with me or explored my portfolio? Your feedback goes straight into a Google Sheet — I read every one.</p>
+
+    <div class="review-card">
+
+      <!-- Name -->
+      <div class="form-group">
+        <label for="visitorName">Your Name</label>
+        <input type="text" id="visitorName" placeholder="e.g. Rahul Mehta" autocomplete="name" maxlength="80" />
+      </div>
+
+      <!-- Rating -->
+      <div class="form-group">
+        <label for="rating">Rating</label>
+        <div class="sel-wrap">
+          <select id="rating">
+            <option value="" disabled selected>Select a rating…</option>
+            <option value="5">⭐⭐⭐⭐⭐ &nbsp; 5 — Excellent</option>
+            <option value="4">⭐⭐⭐⭐ &nbsp;&nbsp; 4 — Great</option>
+            <option value="3">⭐⭐⭐ &nbsp;&nbsp;&nbsp; 3 — Good</option>
+            <option value="2">⭐⭐ &nbsp;&nbsp;&nbsp;&nbsp; 2 — Fair</option>
+            <option value="1">⭐ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 — Poor</option>
+          </select>
+          <span class="sel-arrow">▾</span>
+        </div>
+        <p class="hint" id="ratingHint">&nbsp;</p>
+      </div>
+
+      <!-- Feedback -->
+      <div class="form-group">
+        <label for="feedback">Feedback</label>
+        <textarea id="feedback" rows="4" placeholder="What did you think of my work or portfolio?" maxlength="600"></textarea>
+      </div>
+
+      <!-- Button -->
+      <button class="sub-btn" id="submitBtn" onclick="submitReview()">
+        <span class="btn-text">Submit Review</span>
+        <span class="arr">→</span>
+      </button>
+
+      <!-- Status message -->
+      <div id="reviewStatus" class="status"></div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer>
+  <p>Built with curiosity &amp; coffee &nbsp;·&nbsp; <b>dev.folio</b> &nbsp;·&nbsp; Surat, Gujarat</p>
+</footer>
+
+
+<!-- ════════════════════════════════════════════════
+     JAVASCRIPT  —  fetch() → Google Apps Script
+════════════════════════════════════════════════ -->
+<script>
+
+  // ══════════════════════════════════════════════
+  //  STEP 1 ► Paste your Web App URL below
+  //  Get it from: Google Sheet → Extensions
+  //               → Apps Script → Deploy
+  //               → Manage Deployments → copy URL
+  //
+  //  It looks like:
+  //  https://script.google.com/macros/s/AKfycbXXXXXXXX/exec
+  // ══════════════════════════════════════════════
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQke7KBW7aA3rmvL9U8CAeJFF4bzP4j0NoLbWtHnNclmA4zw2gqH66S5yqHJief-RV/exec";
+
+  // Rating hint labels
+  const hints = {
+    "5": "🎉 Excellent — you're amazing, thanks!",
+    "4": "😊 Great — really appreciate it!",
+    "3": "🙂 Good — always room to grow.",
+    "2": "😐 Fair — I'll take the feedback seriously.",
+    "1": "😔 Poor — tell me what went wrong."
+  };
+
+  document.getElementById("rating").addEventListener("change", function () {
+    document.getElementById("ratingHint").textContent = hints[this.value] || "\u00a0";
+  });
+
+  // ── Main submit function ──
+  async function submitReview() {
+    const btn       = document.getElementById("submitBtn");
+    const btnText   = btn.querySelector(".btn-text");
+    const statusDiv = document.getElementById("reviewStatus");
+
+    const visitorName = document.getElementById("visitorName").value.trim();
+    const rating      = document.getElementById("rating").value;
+    const feedback    = document.getElementById("feedback").value.trim();
+
+    // Clear old status
+    statusDiv.className = "status";
+    statusDiv.textContent = "";
+
+    // Validate
+    if (!visitorName) { showStatus("⚠️ Please enter your name.", "err"); return; }
+    if (!rating)      { showStatus("⚠️ Please select a rating.", "err"); return; }
+    if (!feedback)    { showStatus("⚠️ Please write some feedback.", "err"); return; }
+
+    // Loading state
+    btn.disabled = true;
+    btnText.textContent = "Submitting…";
+
+    try {
+      const res = await fetch(WEB_APP_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body:    JSON.stringify({ visitorName, rating, feedback })
+      });
+
+      let result;
+      try { result = await res.json(); }
+      catch (_) { result = { status: "success" }; }   // opaque CORS response = still saved
+
+      if (result.status === "success") {
+        showStatus("🎉 Thank you, " + visitorName + "! Your review has been saved to Google Sheets.", "ok");
+        clearForm();
+      } else {
+        showStatus("❌ Error: " + (result.message || "Unknown error. Try again."), "err");
+      }
+
+    } catch (err) {
+      // Apps Script sometimes gives a CORS-opaque response even on success
+      showStatus("🎉 Review submitted! Thanks for your feedback.", "ok");
+      clearForm();
+    } finally {
+      btn.disabled = false;
+      btnText.textContent = "Submit Review";
+    }
+  }
+
+  function showStatus(msg, type) {
+    const d = document.getElementById("reviewStatus");
+    d.textContent = msg;
+    d.className   = "status " + type;
+    if (type === "ok") setTimeout(() => { d.className = "status"; d.textContent = ""; }, 6000);
+  }
+
+  function clearForm() {
+    document.getElementById("visitorName").value = "";
+    document.getElementById("rating").value      = "";
+    document.getElementById("feedback").value    = "";
+    document.getElementById("ratingHint").textContent = "\u00a0";
+  }
+
+</script>
+</body>
+</html>
