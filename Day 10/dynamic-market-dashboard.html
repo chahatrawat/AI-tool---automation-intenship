@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Market Dashboard</title>
+
+  <!-- ===== GOOGLE FONTS ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ========================================
+       CSS CUSTOM PROPERTIES (DESIGN TOKENS)
+    ======================================== */
+    :root {
+      --bg-base:      #0d1117;
+      --bg-surface:   #161b22;
+      --bg-card:      #1c2230;
+      --bg-hover:     #222c3c;
+
+      --accent-1:     #4f8ef7;   /* electric blue */
+      --accent-2:     #a78bfa;   /* soft violet */
+      --accent-3:     #34d399;   /* emerald green */
+      --accent-warn:  #f59e0b;   /* amber */
+      --accent-danger:#f87171;   /* rose */
+
+      --text-primary: #e6edf3;
+      --text-muted:   #8b949e;
+      --text-faint:   #484f58;
+
+      --border:       rgba(255,255,255,0.07);
+      --border-focus: rgba(79,142,247,0.5);
+
+      --radius-sm:    8px;
+      --radius-md:    14px;
+      --radius-lg:    20px;
+
+      --shadow-card:  0 4px 24px rgba(0,0,0,0.35);
+      --shadow-hover: 0 8px 36px rgba(0,0,0,0.5);
+
+      --font-ui:      'Inter', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    /* ========================================
+       RESET & BASE
+    ======================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+    }
+
+    /* ========================================
+       HEADER
+    ======================================== */
+    header {
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1520 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle grid background pattern */
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Glowing orb */
+    header::after {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 420px;
+      height: 200px;
+      background: radial-gradient(ellipse, rgba(79,142,247,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-1);
+      margin-bottom: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-eyebrow span.dot {
+      width: 6px; height: 6px;
+      background: var(--accent-1);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    h1.dashboard-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #e6edf3 30%, var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.6rem;
+    }
+
+    .header-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 400;
+    }
+
+    /* ========================================
+       MAIN LAYOUT
+    ======================================== */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* ========================================
+       SECTION LABELS
+    ======================================== */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 1rem;
+    }
+
+    /* ========================================
+       STATS CARDS
+    ======================================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .stat-card .stat-icon {
+      font-size: 1.3rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .stat-card.blue  .stat-value { color: var(--accent-1); }
+    .stat-card.green .stat-value { color: var(--accent-3); }
+    .stat-card.violet .stat-value { color: var(--accent-2); }
+
+    /* ========================================
+       PRODUCTS GRID
+    ======================================== */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+
+    /* ========================================
+       PRODUCT CARD
+    ======================================== */
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      cursor: default;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(79,142,247,0.35);
+      box-shadow: var(--shadow-hover);
+      background: var(--bg-hover);
+    }
+
+    /* Card top row: category badge + stock status */
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .category-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3em 0.75em;
+      border-radius: 999px;
+      background: rgba(79,142,247,0.12);
+      color: var(--accent-1);
+      border: 1px solid rgba(79,142,247,0.25);
+    }
+
+    .category-badge.audio      { background: rgba(167,139,250,0.12); color: var(--accent-2); border-color: rgba(167,139,250,0.25); }
+    .category-badge.wearables  { background: rgba(52,211,153,0.12);  color: var(--accent-3); border-color: rgba(52,211,153,0.25); }
+    .category-badge.accessories{ background: rgba(245,158,11,0.12);  color: var(--accent-warn); border-color: rgba(245,158,11,0.25); }
+
+    .stock-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3em 0.7em;
+      border-radius: 999px;
+    }
+
+    .stock-badge.in-stock  { background: rgba(52,211,153,0.15); color: var(--accent-3); border: 1px solid rgba(52,211,153,0.3); }
+    .stock-badge.out-stock { background: rgba(248,113,113,0.12); color: var(--accent-danger); border: 1px solid rgba(248,113,113,0.3); }
+
+    /* Product name */
+    .card-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+
+    /* Metadata rows */
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .meta-row .meta-key {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .meta-row .meta-val {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Price highlight */
+    .card-price {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--accent-1);
+      letter-spacing: -0.025em;
+    }
+
+    .card-price span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-right: 1px;
+    }
+
+    /* Star rating */
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .star {
+      font-size: 0.85rem;
+      color: var(--text-faint);
+    }
+
+    .star.filled { color: var(--accent-warn); }
+
+    .rating-num {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Divider */
+    .card-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ========================================
+       SHARE DATA BUTTON
+    ======================================== */
+    .actions-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 3rem;
+    }
+
+    .btn-share {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.75rem 1.6rem;
+      background: linear-gradient(135deg, var(--accent-1), #6366f1);
+      color: #fff;
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(79,142,247,0.35);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+
+    .btn-share:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(79,142,247,0.5);
+      filter: brightness(1.1);
+    }
+
+    .btn-share:active {
+      transform: translateY(0);
+      filter: brightness(0.95);
+    }
+
+    .btn-share svg {
+      width: 17px; height: 17px;
+      fill: currentColor;
+    }
+
+    /* ========================================
+       FOOTER
+    ======================================== */
+    footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      padding: 1.4rem 1.5rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+      letter-spacing: 0.04em;
+    }
+
+    footer strong {
+      color: var(--text-muted);
+    }
+
+    /* ========================================
+       RESPONSIVE TWEAKS
+    ======================================== */
+    @media (max-width: 600px) {
+      main { padding: 1.75rem 1rem; }
+      .products-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .actions-row { justify-content: center; }
+    }
+
+    @media (min-width: 1024px) {
+      .products-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================
+       HEADER
+  ======================================== -->
+  <header>
+    <div class="header-inner">
+      <div class="header-eyebrow">
+        <span class="dot"></span>
+        Live Market Data
+      </div>
+      <h1 class="dashboard-title">Dynamic Market Dashboard</h1>
+      <p class="header-subtitle">Real‑time product analytics · JSON &amp; DOM Manipulation · API Simulation</p>
+    </div>
+  </header>
+
+  <!-- ========================================
+       MAIN CONTENT
+  ======================================== -->
+  <main>
+
+    <!-- Statistics Section -->
+    <p class="section-label">— Overview</p>
+    <div class="stats-grid" id="stats-grid">
+      <!-- Stats injected by JS -->
+    </div>
+
+    <!-- Share Button -->
+    <div class="actions-row">
+      <button class="btn-share" id="share-btn">
+        <!-- Paper-plane icon (inline SVG) -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+        Share Data
+      </button>
+    </div>
+
+    <!-- Products Section -->
+    <p class="section-label">— Product Catalogue</p>
+    <div class="products-grid" id="products-grid">
+      <!-- Product cards injected by JS -->
+    </div>
+
+  </main>
+
+  <!-- ========================================
+       FOOTER
+  ======================================== -->
+  <footer>
+    <strong>Dynamic Market Dashboard</strong> | JSON + DOM Manipulation + API Simulation
+  </footer>
+
+
+  <!-- ========================================
+       JAVASCRIPT
+  ======================================== -->
+  <script>
+
+    /* ----------------------------------------
+       1. JSON DATA — Product Catalogue
+    ---------------------------------------- */
+    const products = [
+      {
+        productId: "PRD-1001",
+        productName: "Sony WH-1000XM5 Headphones",
+        category: "Audio",
+        price: 349.99,
+        inStock: true,
+        rating: 4.8
+      },
+      {
+        productId: "PRD-1002",
+        productName: "Apple MacBook Pro 14\"",
+        category: "Electronics",
+        price: 1999.00,
+        inStock: true,
+        rating: 4.9
+      },
+      {
+        productId: "PRD-1003",
+        productName: "Samsung Galaxy Watch 6",
+        category: "Wearables",
+        price: 299.99,
+        inStock: true,
+        rating: 4.5
+      },
+      {
+        productId: "PRD-1004",
+        productName: "Logitech MX Master 3S",
+        category: "Accessories",
+        price: 99.99,
+        inStock: false,
+        rating: 4.7
+      },
+      {
+        productId: "PRD-1005",
+        productName: "Jabra Elite 10 Earbuds",
+        category: "Audio",
+        price: 249.95,
+        inStock: false,
+        rating: 4.6
+      },
+      {
+        productId: "PRD-1006",
+        productName: "Dell 27\" 4K USB-C Monitor",
+        category: "Electronics",
+        price: 549.00,
+        inStock: true,
+        rating: 4.4
+      }
+    ];
+
+
+    /* ----------------------------------------
+       2. HELPER — Build star markup
+    ---------------------------------------- */
+    function buildStars(rating) {
+      const full  = Math.floor(rating);
+      const half  = rating % 1 >= 0.5 ? 1 : 0;
+      const empty = 5 - full - half;
+
+      let html = '<div class="stars" aria-label="Rating: ' + rating + ' out of 5">';
+      for (let i = 0; i < full;  i++) html += '<span class="star filled">★</span>';
+      if (half)                        html += '<span class="star filled">★</span>';
+      for (let i = 0; i < empty; i++) html += '<span class="star">★</span>';
+      html += '</div>';
+      return html;
+    }
+
+
+    /* ----------------------------------------
+       3. RENDER PRODUCTS — DOM Manipulation
+    ---------------------------------------- */
+    function renderProducts() {
+      const grid = document.getElementById('products-grid');
+
+      products.forEach(product => {
+        // Create card element
+        const card = document.createElement('article');
+        card.classList.add('product-card');
+
+        // Category CSS modifier
+        const catClass = product.category.toLowerCase();
+
+        // Stock badge
+        const stockClass = product.inStock ? 'in-stock'  : 'out-stock';
+        const stockLabel = product.inStock ? '✓ In Stock' : '✕ Out of Stock';
+
+        // Stars HTML
+        const starsHtml = buildStars(product.rating);
+
+        // Format price
+        const formattedPrice = product.price.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+
+        // Inject inner HTML using template literal
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="category-badge ${catClass}">${product.category}</span>
+            <span class="stock-badge ${stockClass}">${stockLabel}</span>
+          </div>
+
+          <h2 class="card-name">${product.productName}</h2>
+
+          <div class="card-price">
+            <span>$</span>${formattedPrice}
+          </div>
+
+          <hr class="card-divider" />
+
+          <div class="card-meta">
+            <div class="meta-row">
+              <span class="meta-key">Product ID</span>
+              <span class="meta-val">${product.productId}</span>
+            </div>
+          </div>
+
+          <div class="rating-row">
+            ${starsHtml}
+            <span class="rating-num">${product.rating} / 5</span>
+          </div>
+        `;
+
+        // Append card to grid
+        grid.appendChild(card);
+      });
+    }
+
+
+    /* ----------------------------------------
+       4. UPDATE STATS — Summary Cards
+    ---------------------------------------- */
+    function updateStats() {
+      // Calculate values using array methods
+      const totalProducts    = products.length;
+      const availableProducts = products.filter(p => p.inStock).length;
+      const averageRating    = (
+        products.reduce((sum, p) => sum + p.rating, 0) / products.length
+      ).toFixed(1);
+
+      // Stats card definitions
+      const stats = [
+        {
+          icon: '📦',
+          value: totalProducts,
+          label: 'Total Products',
+          colorClass: 'blue'
+        },
+        {
+          icon: '✅',
+          value: availableProducts,
+          label: 'Available Products',
+          colorClass: 'green'
+        },
+        {
+          icon: '⭐',
+          value: averageRating,
+          label: 'Average Rating',
+          colorClass: 'violet'
+        }
+      ];
+
+      const grid = document.getElementById('stats-grid');
+
+      stats.forEach(stat => {
+        const card = document.createElement('div');
+        card.classList.add('stat-card', stat.colorClass);
+        card.innerHTML = `
+          <div class="stat-icon">${stat.icon}</div>
+          <div class="stat-value">${stat.value}</div>
+          <div class="stat-label">${stat.label}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+
+    /* ----------------------------------------
+       5. SHARE DATA — API Payload Simulation
+    ---------------------------------------- */
+    function shareData() {
+      // Build a Telegram Bot API-style payload
+      const payload = {
+        chat_id: "123456789",
+        action: "send_market_report",
+        timestamp: new Date().toISOString(),
+        totalProducts: products.length,
+        products: products.map(p => ({
+          productId:   p.productId,
+          productName: p.productName,
+          category:    p.category,
+          price:       `$${p.price.toFixed(2)}`,
+          inStock:     p.inStock,
+          rating:      p.rating
+        }))
+      };
+
+      // Print formatted JSON to browser console
+      console.log('%cDynamic Market Dashboard — Shared Payload', 'color:#4f8ef7;font-weight:700;font-size:14px;');
+      console.log(JSON.stringify(payload, null, 2));
+
+      // Notify user
+      alert('Data Shared Successfully! Check Console.');
+    }
+
+
+    /* ----------------------------------------
+       6. EVENT LISTENER — Share Button
+    ---------------------------------------- */
+    document.getElementById('share-btn').addEventListener('click', shareData);
+
+
+    /* ----------------------------------------
+       7. INIT — Render everything on load
+    ---------------------------------------- */
+    updateStats();
+    renderProducts();
+
+  </script>
+
+</body>
+</html>
